@@ -1,25 +1,26 @@
+import { Suspense } from 'react';
 import {
-  Await,
-  defer,
+  useRouteLoaderData,
   json,
   redirect,
-  useRouteLoaderData,
-} from "react-router-dom";
+  defer,
+  Await,
+} from 'react-router-dom';
 
-import EventItem from "../components/EventItem";
-import EventsList from "../components/EventsList";
-import { Suspense } from "react";
+import EventItem from '../components/EventItem';
+import EventsList from '../components/EventsList';
 
 function EventDetailPage() {
-  const { event, events } = useRouteLoaderData("event-detail");
+  const { event, events } = useRouteLoaderData('event-detail');
+
   return (
     <>
-      <Suspense fallback={<p style={{ textAlign: "center" }}>Loading...</p>}>
+      <Suspense fallback={<p style={{ textAlign: 'center' }}>Loading...</p>}>
         <Await resolve={event}>
           {(loadedEvent) => <EventItem event={loadedEvent} />}
         </Await>
       </Suspense>
-      <Suspense fallback={<p style={{ textAlign: "center" }}>Loading...</p>}>
+      <Suspense fallback={<p style={{ textAlign: 'center' }}>Loading...</p>}>
         <Await resolve={events}>
           {(loadedEvents) => <EventsList events={loadedEvents} />}
         </Await>
@@ -31,11 +32,14 @@ function EventDetailPage() {
 export default EventDetailPage;
 
 async function loadEvent(id) {
-  const response = await fetch("http://localhost:8080/events/" + id);
+  const response = await fetch('http://localhost:8080/events/' + id);
+
   if (!response.ok) {
     throw json(
-      { message: "Couldn't fetch detail for selected event." },
-      { status: 500 }
+      { message: 'Could not fetch details for selected event.' },
+      {
+        status: 500,
+      }
     );
   } else {
     const resData = await response.json();
@@ -44,16 +48,19 @@ async function loadEvent(id) {
 }
 
 async function loadEvents() {
-  const response = await fetch("http://localhost:8080/events");
+  const response = await fetch('http://localhost:8080/events');
 
   if (!response.ok) {
-    // return { isError: true, message: "Couldn't fetch events." };
-
-    // throw new Response(JSON.stringify({ message: "Couldn't fetch events." }), {
+    // return { isError: true, message: 'Could not fetch events.' };
+    // throw new Response(JSON.stringify({ message: 'Could not fetch events.' }), {
     //   status: 500,
     // });
-
-    throw json({ message: "Couldn't fetch events." }, { status: 500 });
+    throw json(
+      { message: 'Could not fetch events.' },
+      {
+        status: 500,
+      }
+    );
   } else {
     const resData = await response.json();
     return resData.events;
@@ -71,11 +78,17 @@ export async function loader({ request, params }) {
 
 export async function action({ params, request }) {
   const eventId = params.eventId;
-  const response = await fetch("http://localhost8080/events/" + eventId, {
+  const response = await fetch('http://localhost:8080/events/' + eventId, {
     method: request.method,
   });
+
   if (!response.ok) {
-    throw json({ message: "Couldn't delete event." }, { status: 500 });
+    throw json(
+      { message: 'Could not delete event.' },
+      {
+        status: 500,
+      }
+    );
   }
-  return redirect("/events");
+  return redirect('/events');
 }
